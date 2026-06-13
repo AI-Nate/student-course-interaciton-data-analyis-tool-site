@@ -1,4 +1,5 @@
 import { generateWeeklyReport, parseCsv, reportToText, validateRows } from './reportEngine.js';
+import { createPilotRecord, loadPilotRecords, optionallyPostRecord, recordsToCsv, savePilotRecord, sourceFromUrl, summarizePilotRecords } from './pilotInterest.js';
 
 const state = {
   rows: [],
@@ -17,7 +18,13 @@ const elements = {
   copy: document.querySelector('#copy-report'),
   print: document.querySelector('#print-report'),
   status: document.querySelector('#import-status'),
-  report: document.querySelector('#report')
+  report: document.querySelector('#report'),
+  pilotForm: document.querySelector('#pilot-form'),
+  pilotStatus: document.querySelector('#pilot-status'),
+  pilotSummary: document.querySelector('#pilot-summary'),
+  copyPilotRequest: document.querySelector('#copy-pilot-request'),
+  downloadPilotJson: document.querySelector('#download-pilot-json'),
+  downloadPilotCsv: document.querySelector('#download-pilot-csv')
 };
 
 elements.file.addEventListener('change', async (event) => {
@@ -54,6 +61,34 @@ elements.copy.addEventListener('click', async () => {
 });
 
 elements.print.addEventListener('click', () => window.print());
+
+elements.pilotForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  const formData = pilotFormData(new FormData(elements.pilotForm));
+  try {
+    const record = createPilotRecord(formData, sourceFromUrl(window.location.href));
+    savePilotRecord(record);
+    state.lastPilotRecord = record;
+    elements.copyPilotRequest.disabled = false;
+    renderPilotSummary();
+    await optionallyPostRecord(record);
+    setPilotStatus('Thanks — your pilot interest was recorded. Next, we will review your LMS/data availability and may follow up about a sample report. No automated student outreach will happen.', 'success');
+    elements.pilotForm.reset();
+  } catch (error) {
+    setPilotStatus(error.message, 'error');
+  }
+});
+
+elements.copyPilotRequest.addEventListener('click', async () => {
+  if (!state.lastPilotRecord) return;
+  await navigator.clipboard.writeText(JSON.stringify(state.lastPilotRecord, null, 2));
+  setPilotStatus('Pilot request copied as JSON.', 'success');
+});
+
+elements.downloadPilotJson.addEventListener('click', () => downloadText('pilot-interest-records.json', JSON.stringify(loadPilotRecords(), null, 2), 'application/json'));
+elements.downloadPilotCsv.addEventListener('click', () => downloadText('pilot-interest-records.csv', recordsToCsv(loadPilotRecords()), 'text/csv'));
+
+renderPilotSummary();
 
 async function importCsv(text, label) {
   try {
@@ -145,4 +180,55 @@ function formatDate(value) {
 
 function escapeHtml(value) {
   return String(value).replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' })[char]);
+}
+
+
+function pilotFormData(formData) {
+  return {
+    name: formData.get('name'),
+    email: formData.get('email'),
+    role: formData.get('role'),
+    institutionType: formData.get('institutionType'),
+    lms: formData.get('lms'),
+    courseSize: formData.get('courseSize'),
+    canExportData: formData.get('canExportData'),
+    courseProblem: formData.get('courseProblem'),
+    privacyConcerns: formData.getAll('privacyConcerns'),
+    cohortOnlyPreference: formData.get('cohortOnlyPreference') === 'true'
+  };
+}
+
+function renderPilotSummary() {
+  const summary = summarizePilotRecords(loadPilotRecords());
+  elements.pilotSummary.innerHTML = [
+    summaryCard(summary.total, 'total pilot records'),
+    summaryCard(formatCounts(summary.byLms), 'by LMS'),
+    summaryCard(formatCounts(summary.byRole), 'by role'),
+    summaryCard(formatCounts(summary.byPrivacyConcern), 'by privacy concern'),
+    summaryCard(formatCounts(summary.bySourceChannel), 'by source/channel'),
+    summaryCard(formatCounts(summary.canExportData), 'CSV/activity export readiness')
+  ].join('');
+}
+
+function summaryCard(value, label) {
+  return `<article class="metric-card compact"><strong>${escapeHtml(String(value || '—'))}</strong><span>${escapeHtml(label)}</span></article>`;
+}
+
+function formatCounts(counts) {
+  const entries = Object.entries(counts);
+  return entries.length ? entries.map(([key, value]) => `${key}: ${value}`).join(' · ') : '—';
+}
+
+function downloadText(filename, text, type) {
+  const blob = new Blob([text], { type });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+function setPilotStatus(message, type) {
+  elements.pilotStatus.textContent = message;
+  elements.pilotStatus.dataset.type = type;
 }

@@ -10,7 +10,8 @@
     <header class="hero">
       <p class="eyebrow">Course interaction analytics</p>
       <h1>Weekly Lecturer Learning-Path Report</h1>
-      <p>Import one course CSV and generate an action-oriented weekly report that highlights cohort trouble spots first, then authorized student-level attention signals.</p>
+      <p>Import one course CSV and generate an action-oriented weekly report that highlights which students need attention, where the course path is breaking, and what to do this week.</p>
+      <p class="hero-actions"><a class="button-link" href="#pilot-interest">Join the pilot</a><a class="button-link secondary" href="#report">Preview the report</a></p>
     </header>
     <main>
       <aside class="panel" aria-label="Report controls">
@@ -49,6 +50,108 @@
         </div>
       </article>
     </main>
+
+    <section id="pilot-interest" class="pilot-shell" aria-labelledby="pilot-title">
+      <div class="pilot-intro">
+        <p class="eyebrow">Pilot interest</p>
+        <h2 id="pilot-title">Join the pilot or share what your LMS can export</h2>
+        <p>Tell us whether this report would help your course. This first form does <strong>not</strong> request student records, uploads, names, grades, or any identifiable learner data.</p>
+        <ul>
+          <li>We store educator contact details and pilot-fit signals only.</li>
+          <li>We track source/campaign parameters from outreach links so GTM can measure conversion.</li>
+          <li>Next step: review LMS/data availability and, only with approval, discuss a sample report.</li>
+        </ul>
+      </div>
+
+      <form id="pilot-form" class="pilot-form">
+        <div class="form-grid">
+          <label class="field">Name
+            <input name="name" autocomplete="name" required />
+          </label>
+          <label class="field">Email
+            <input name="email" type="email" autocomplete="email" required />
+          </label>
+          <label class="field">Role
+            <select name="role" required>
+              <option value="">Select one</option>
+              <option>Lecturer / instructor</option>
+              <option>Advisor</option>
+              <option>Instructional designer</option>
+              <option>Department admin</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="field">Institution / organization type
+            <select name="institutionType" required>
+              <option value="">Select one</option>
+              <option>Higher education</option>
+              <option>K-12 / school</option>
+              <option>MOOC / online program</option>
+              <option>Corporate learning</option>
+              <option>Other</option>
+            </select>
+          </label>
+          <label class="field">LMS used
+            <select name="lms" required>
+              <option value="">Select one</option>
+              <option>Canvas</option>
+              <option>Blackboard</option>
+              <option>Moodle</option>
+              <option>D2L Brightspace</option>
+              <option>Google Classroom</option>
+              <option>Other / unsure</option>
+            </select>
+          </label>
+          <label class="field">Approximate course size
+            <select name="courseSize" required>
+              <option value="">Select one</option>
+              <option>Under 25 students</option>
+              <option>25–75 students</option>
+              <option>76–150 students</option>
+              <option>151–300 students</option>
+              <option>300+ students</option>
+            </select>
+          </label>
+          <label class="field">Can you export CSV/activity data?
+            <select name="canExportData" required>
+              <option value="">Select one</option>
+              <option>Yes, activity/resource/submission data</option>
+              <option>Yes, grades/submissions only</option>
+              <option>Maybe, need admin approval</option>
+              <option>No export access yet</option>
+            </select>
+          </label>
+          <label class="field wide">Course-learning problem you want solved (optional)
+            <textarea name="courseProblem" rows="4" placeholder="Example: Students start Assignment 2 late and skip the worked example."></textarea>
+          </label>
+        </div>
+
+        <fieldset>
+          <legend>Privacy/compliance concerns</legend>
+          <label class="checkbox"><input type="checkbox" name="privacyConcerns" value="FERPA/PII concerns" /> FERPA/PII concerns</label>
+          <label class="checkbox"><input type="checkbox" name="privacyConcerns" value="Institutional approval needed" /> Institutional approval needed</label>
+          <label class="checkbox"><input type="checkbox" name="privacyConcerns" value="Student data-sharing concern" /> Student data-sharing concern</label>
+          <label class="checkbox"><input type="checkbox" name="cohortOnlyPreference" value="true" /> Prefer cohort-only reports with no student names</label>
+        </fieldset>
+
+        <p class="privacy-note"><strong>Before you submit:</strong> v2 collects pilot interest only: your contact details, role, LMS/data-export readiness, privacy concerns, and outreach source metadata. Do not upload or paste student-level data here.</p>
+        <div class="actions">
+          <button type="submit">Join the pilot</button>
+          <button id="copy-pilot-request" type="button" class="secondary" disabled>Copy my request</button>
+        </div>
+        <p id="pilot-status" role="status"></p>
+      </form>
+
+      <details class="signal-export">
+        <summary>GTM signal export</summary>
+        <p>Records submitted in this browser are stored locally for inspection/export. If a backend endpoint is configured as <code>window.PILOT_INTEREST_ENDPOINT</code>, submissions are also posted there.</p>
+        <div id="pilot-summary" class="summary-grid"></div>
+        <div class="actions">
+          <button id="download-pilot-json" type="button" class="secondary">Download JSON</button>
+          <button id="download-pilot-csv" type="button" class="secondary">Download CSV</button>
+        </div>
+      </details>
+    </section>
     <script type="module" src="./assets/app.js"></script>
   </body>
 </html>

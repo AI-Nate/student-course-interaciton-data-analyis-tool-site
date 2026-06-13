@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weekly Lecturer Learning-Path Report</title>
+    <link rel="stylesheet" href="./assets/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <p class="eyebrow">Course interaction analytics</p>
+      <h1>Weekly Lecturer Learning-Path Report</h1>
+      <p>Import one course CSV and generate an action-oriented weekly report that highlights cohort trouble spots first, then authorized student-level attention signals.</p>
+    </header>
+    <main>
+      <aside class="panel" aria-label="Report controls">
+        <h2>1. Import course data</h2>
+        <p>Use the generic CSV template fields documented in the README, or load the sample to preview the workflow.</p>
+        <label class="field">Course CSV
+          <input id="csv-file" type="file" accept=".csv,text/csv" />
+        </label>
+        <button id="load-sample" class="secondary" type="button">Load sample data</button>
+        <p id="import-status" role="status"></p>
+
+        <h2>2. Report settings</h2>
+        <label class="field">Course name
+          <input id="course-name" type="text" placeholder="BIO101: Foundations of Biology" />
+        </label>
+        <label class="field">Selected week
+          <input id="week" type="text" placeholder="Week 5" />
+        </label>
+        <label class="field">Data freshness timestamp
+          <input id="freshness" type="datetime-local" />
+        </label>
+        <label class="checkbox">
+          <input id="authorized-view" type="checkbox" checked />
+          I am authorized to view student-level drill-down for this course.
+        </label>
+        <div class="actions">
+          <button id="generate-report" type="button" disabled>Generate report</button>
+          <button id="copy-report" type="button" class="secondary" disabled>Copy text</button>
+          <button id="print-report" type="button" class="secondary" disabled>Export PDF</button>
+        </div>
+      </aside>
+
+      <article id="report" aria-live="polite">
+        <div class="empty-state">
+          <p>Import course interaction data to generate the weekly lecturer report.</p>
+        </div>
+      </article>
+    </main>
+    <script type="module" src="./assets/app.js"></script>
+  </body>
+</html>
